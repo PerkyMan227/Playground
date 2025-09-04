@@ -1,0 +1,70 @@
+# -----------------------
+# OS / System files
+# -----------------------
+.DS_Store
+Thumbs.db
+
+# -----------------------
+# IDEs / Editors
+# -----------------------
+# VS Code
+.vscode/
+.history/
+
+# JetBrains Rider
+.idea/
+*.iml
+
+# -----------------------
+# Build / Publish
+# -----------------------
+bin/
+obj/
+out/
+[Bb]uild/
+[Ll]ogs/
+[Bb]enchmarkDotNet.Artifacts/
+TestResults/
+*.VisualState.xml
+*.pidb
+*.svclog
+*.scc
+
+# -----------------------
+# NuGet
+# -----------------------
+*.nupkg
+*.snupkg
+*.nuspec
+project.lock.json
+project.fragment.lock.json
+artifacts/
+packages/
+
+# -----------------------
+# User-specific
+# -----------------------
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+# Visual Studio solution (not needed for VS Code)
+*.sln
+
+# -----------------------
+# Other
+# -----------------------
+*.dbmdl
+*.bak
+*.log
+*.tmp
+
+# -----------------------
+# Environment / Secrets
+# -----------------------
+.env
+*.key
+*.pfx
+*.p12
+*.crt
+*.pem
