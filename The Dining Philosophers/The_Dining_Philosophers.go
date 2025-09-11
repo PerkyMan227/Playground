@@ -22,7 +22,8 @@ func Fork(id int, leftReq, rightReq chan string) {
 }
 
 func Philosopher(name string, leftReq, rightReq chan string) {
-	for {
+	meals := 0
+	for meals < 3 {
 		leftReq <- "want"
 		if <-leftReq == "ok" {
 			fmt.Println(name, "picked up LEFT fork")
@@ -38,6 +39,7 @@ func Philosopher(name string, leftReq, rightReq chan string) {
 					leftReq <- "release"
 					rightReq <- "release"
 					fmt.Println(name, "released both forkse. Thinking...")
+					meals++
 
 				}
 			case <-time.After(1 * time.Second):
@@ -47,6 +49,7 @@ func Philosopher(name string, leftReq, rightReq chan string) {
 		}
 		time.Sleep(1 * time.Second)
 	}
+	fmt.Println(name, "Has eaten 3 big meals, and leaves the table")
 }
 
 func main() {
