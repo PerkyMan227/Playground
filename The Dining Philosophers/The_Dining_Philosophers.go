@@ -5,117 +5,70 @@ import (
 	"time"
 )
 
-func Philosopher(name string, leftFork Fork, rightFork Fork) {
-	<-leftFork
-	<-rightFork
+func Fork(id int, leftReq, rightReq chan string) {
+	for {
+		select {
+		case <-leftReq:
+			leftReq <- "ok"
+			<-leftReq
+			fmt.Println("Fork", id, "released by left philosopher")
 
-	fmt.Println(name, "Time to eat!")
-	time.Sleep(time.Second)
+		case <-rightReq:
+			rightReq <- "ok"
+			<-rightReq
+			fmt.Println("Fork", id, "released by right philosopher")
+		}
+	}
+}
 
-	fmt.Println("Done eating")
-	time.Sleep(time.Second)
+func Philosopher(name string, leftReq, rightReq chan string) {
+	for {
+		leftReq <- "want"
+		if <-leftReq == "ok" {
+			fmt.Println(name, "picked up LEFT fork")
 
-	rightFork.Unlock()
-	leftFork.Unlock()
+			rightReq <- "want"
+			select {
+			case reply := <-rightReq:
+				if reply == "ok" {
+					fmt.Println(name, "picked up right fork.")
+					fmt.Println(name, " IS EATING")
+					time.Sleep(2 * time.Second)
 
+					leftReq <- "release"
+					rightReq <- "release"
+					fmt.Println(name, "released both forkse. Thinking...")
+
+				}
+			case <-time.After(1 * time.Second):
+				fmt.Println("Could not find right fork. Realeasing left fork")
+				leftReq <- "release"
+			}
+		}
+		time.Sleep(1 * time.Second)
+	}
 }
 
 func main() {
-	/*
-		bobTurn := make(chan bool)
-		mannyTurn := make(chan bool)
-	*/
 
-	fork1 := &Fork{rightPhilosopher: "Aristoteles", leftPhilosopher: "Platon"}
-	fork2 := &Fork{rightPhilosopher: "Platon", leftPhilosopher: "Kant"}
-	fork3 := &Fork{rightPhilosopher: "Kant", leftPhilosopher: "Karl Marx"}
-	fork4 := &Fork{rightPhilosopher: "Karl Marx", leftPhilosopher: "Kong Fuzi"}
-	fork5 := &Fork{rightPhilosopher: "Kong Fuzi", leftPhilosopher: "Aristoteles"}
+	ch1 := make(chan string, 1)
+	ch2 := make(chan string, 1)
+	ch3 := make(chan string, 1)
+	ch4 := make(chan string, 1)
+	ch5 := make(chan string, 1)
 
-	go Philosopher("Aristoteles", fork1, fork5)
-	go Philosopher("Platon", fork2, fork1)
-	go Philosopher("Kant", fork3, fork2)
-	go Philosopher("Karl Marx", fork4, fork3)
-	go Philosopher("Kong Fuzi", fork5, fork4)
+	go Philosopher("Kant", ch1, ch2)
+	go Philosopher("Karl Marx", ch2, ch3)
+	go Philosopher("Søren Pape", ch3, ch4)
+	go Philosopher("Kong Fuzi", ch4, ch5)
+	go Philosopher("Aristoteles", ch5, ch1)
+
+	go Fork(1, ch1, ch2)
+	go Fork(2, ch2, ch3)
+	go Fork(3, ch3, ch4)
+	go Fork(4, ch4, ch5)
+	go Fork(5, ch5, ch1)
 
 	select {}
 
 }
-
-/*
-package main
-
-import (
-	"fmt"
-	"time"
-)
-
-// Worker represents Bob or Manny
-func worker(name string, myTurn <-chan bool, otherTurn chan<- bool) {
-	for {
-		// Wait until it's my turn
-		<-myTurn
-
-		// Building a board
-		fmt.Println(name, "is building a board...")
-		time.Sleep(time.Second)
-
-		// Resting
-		fmt.Println(name, "is resting...")
-		time.Sleep(time.Second)
-
-		// Signal to the other worker that it's their turn
-		otherTurn <- true
-	}
-}
-
-func main() {
-	// Channels for turn-taking
-	bobTurn := make(chan bool)
-	mannyTurn := make(chan bool)
-
-	// Start workers
-	go worker("Bob", bobTurn, mannyTurn)
-	go worker("Manny", mannyTurn, bobTurn)
-
-	// Kick things off: Bob starts first
-	bobTurn <- true
-
-	// Keep program alive
-	select {}
-}
-
-package main
-
-import (
-	"fmt"
-	"sync"
-	"time"
-)
-
-const N = 10000000
-
-var balance = 0
-
-var arbiter sync.Mutex
-
-func worker() {
-	for i := 0; i < N; i++ {
-		arbiter.Lock()
-		balance++
-		arbiter.Unlock()
-	}
-	fmt.Println("Done")
-}
-
-func main() {
-
-	go worker()
-	go worker()
-
-	for {
-		time.Sleep(1000 * time.Millisecond)
-		fmt.Println(balance)
-	}
-}
-*/
