@@ -2,28 +2,26 @@ package main
 
 import (
 	"fmt"
+	"math/rand/v2"
 	"time"
 )
 
-func Fork(id int, leftReq, rightReq chan string) {
-	for {
-		select {
-		case <-leftReq:
-			leftReq <- "ok"
-			<-leftReq
-			fmt.Println("Fork", id, "released by left philosopher")
+var waiter = make(chan struct{}, 4)
 
-		case <-rightReq:
-			rightReq <- "ok"
-			<-rightReq
-			fmt.Println("Fork", id, "released by right philosopher")
-		}
-	}
+func Fork(id int, leftReq, rightReq chan string) {
+	fmt.Println("Fork", id, "is ready.")
+	select {}
 }
 
-func Philosopher(name string, leftReq, rightReq chan string) {
+func Philosopher(name string, id int, leftReq, rightReq chan string) {
 	meals := 0
 	for meals < 3 {
+
+		fmt.Println(name, "is thinking...")
+
+		time.Sleep(time.Second * time.Duration(rand.IntN(3)))
+		waiter <- struct{}{}
+
 		leftReq <- "want"
 		if <-leftReq == "ok" {
 			fmt.Println(name, "picked up LEFT fork")
@@ -47,18 +45,19 @@ func Philosopher(name string, leftReq, rightReq chan string) {
 				leftReq <- "release"
 			}
 		}
-		time.Sleep(1 * time.Second)
+		<-waiter
+		time.Sleep(4 * time.Second)
 	}
 	fmt.Println(name, "Has eaten 3 big meals, and leaves the table")
 }
 
 func main() {
 
-	ch1 := make(chan string, 1)
-	ch2 := make(chan string, 1)
-	ch3 := make(chan string, 1)
-	ch4 := make(chan string, 1)
-	ch5 := make(chan string, 1)
+	ch1 := make(chan string, 2)
+	ch2 := make(chan string, 2)
+	ch3 := make(chan string, 2)
+	ch4 := make(chan string, 2)
+	ch5 := make(chan string, 2)
 
 	go Philosopher("Kant", ch1, ch2)
 	go Philosopher("Karl Marx", ch2, ch3)
