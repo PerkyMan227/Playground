@@ -37,7 +37,7 @@ message LeaveRequest {
 service ChitChatService {
     rpc Join(JoinRequest) returns (JoinResponse);
 
-    rpc Publish(PublishRequest) returns (JoinResponse);
+    rpc Publish(PublishRequest) returns (PublishResponse);
 
     rpc ReceiveBroadcasts(Empty) returns (stream BroadcastMessage);
 
