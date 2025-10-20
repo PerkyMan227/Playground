@@ -1,4 +1,4 @@
-module github.com/PerkyMan227/ChitChat
+module ChitChat
 
 go 1.25.0
 
