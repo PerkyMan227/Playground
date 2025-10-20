@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v6.32.1
-// source: grpc/chitchat.proto
+// source: chitchat.proto
 
 package grpc
 
@@ -30,7 +30,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ChitChatServiceClient interface {
 	Join(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*JoinResponse, error)
-	Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*JoinResponse, error)
+	Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishResponse, error)
 	ReceiveBroadcasts(ctx context.Context, in *Empty, opts ...grpc.CallOption) (grpc.ServerStreamingClient[BroadcastMessage], error)
 	Leave(ctx context.Context, in *LeaveRequest, opts ...grpc.CallOption) (*Empty, error)
 }
@@ -53,9 +53,9 @@ func (c *chitChatServiceClient) Join(ctx context.Context, in *JoinRequest, opts 
 	return out, nil
 }
 
-func (c *chitChatServiceClient) Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*JoinResponse, error) {
+func (c *chitChatServiceClient) Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(JoinResponse)
+	out := new(PublishResponse)
 	err := c.cc.Invoke(ctx, ChitChatService_Publish_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -97,7 +97,7 @@ func (c *chitChatServiceClient) Leave(ctx context.Context, in *LeaveRequest, opt
 // for forward compatibility.
 type ChitChatServiceServer interface {
 	Join(context.Context, *JoinRequest) (*JoinResponse, error)
-	Publish(context.Context, *PublishRequest) (*JoinResponse, error)
+	Publish(context.Context, *PublishRequest) (*PublishResponse, error)
 	ReceiveBroadcasts(*Empty, grpc.ServerStreamingServer[BroadcastMessage]) error
 	Leave(context.Context, *LeaveRequest) (*Empty, error)
 	mustEmbedUnimplementedChitChatServiceServer()
@@ -113,7 +113,7 @@ type UnimplementedChitChatServiceServer struct{}
 func (UnimplementedChitChatServiceServer) Join(context.Context, *JoinRequest) (*JoinResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Join not implemented")
 }
-func (UnimplementedChitChatServiceServer) Publish(context.Context, *PublishRequest) (*JoinResponse, error) {
+func (UnimplementedChitChatServiceServer) Publish(context.Context, *PublishRequest) (*PublishResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Publish not implemented")
 }
 func (UnimplementedChitChatServiceServer) ReceiveBroadcasts(*Empty, grpc.ServerStreamingServer[BroadcastMessage]) error {
@@ -235,5 +235,5 @@ var ChitChatService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "grpc/chitchat.proto",
+	Metadata: "chitchat.proto",
 }
